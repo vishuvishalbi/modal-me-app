@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <h1 class="title"><img src="../../assets/images/logo-no-text.png" style="height: 32px; margin-top: 5px;"></h1>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-card *ngFor="let item of orders | keyvalue" [routerLink]="'/tabs/' + item.value?.key + '/detail'">
+    <ion-card-header >
+      <ion-card-subtitle>{{item.value?.startTime | date:'mediumDate' }}</ion-card-subtitle>
+      <ion-card-title>{{item.value?.tripName}}</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p>Organized by: {{item.value.user?.name}}<br>Status: {{item.value?.transportationStatus}}</p>
+      <p class="card-description">{{item.value?.tripDetails}}</p>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
