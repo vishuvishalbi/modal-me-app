@@ -207,11 +207,29 @@ export class FirebaseService {
                 .orderByChild('phone')
                 .equalTo(passengerData.phone)
                 .on('value', (resp) => {
+                    let insert = true;
                     let data = this.snapshotToObject(resp);
-
-                    if (data.hasOwnProperty('orderId') && data.orderId == passengerData.orderId) {
-                        resolve(data);
+                    if (typeof data == "object") {
+                        for (var i in data) {
+                            if (data[i].hasOwnProperty('orderId') && data[i].orderId == passengerData.orderId) {
+                                resolve(data);
+                                insert = false;
+                            }
+                        }
+                    } else if (typeof data == "array") {
+                        for (let i = 0; i < data.length; i++) {
+                            if (data[i].hasOwnProperty('orderId') && data[i].orderId == passengerData.orderId) {
+                                resolve(data);
+                                insert = false;
+                            }
+                        }
                     } else {
+                        if (data.hasOwnProperty('orderId') && data.orderId == passengerData.orderId) {
+                            resolve(data);
+                            insert = false;
+                        }
+                    }
+                    if (insert) {
                         var newPassengerKey = firebase.database().ref().child('passengers').push().key;
                         var passengerUpdates = {};
                         passengerUpdates['/passengers/' + newPassengerKey] = passengerData;
