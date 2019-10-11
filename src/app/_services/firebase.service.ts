@@ -105,7 +105,7 @@ export class FirebaseService {
         let item = snapshot.val();
         console.log('item', item)
         console.log('snapshot', snapshot)
-        if (typeof snapshot == 'object' && snapshot.hasOwnProperty('key')){
+        if (typeof snapshot == 'object' && snapshot.hasOwnProperty('key')) {
             item.key = snapshot.key;
         }
         return item;
@@ -202,15 +202,26 @@ export class FirebaseService {
 
     async setPassengers(passengerData) {
         return new Promise<any>((resolve, reject) => {
-            var newPassengerKey = firebase.database().ref().child('passengers').push().key;
-            var passengerUpdates = {};
-            passengerUpdates['/passengers/' + newPassengerKey] = passengerData;
+            firebase.database()
+                .ref(`passengers/`)
+                .orderByChild('phone')
+                .equalTo(passengerData.phone)
+                .on('value', (resp) => {
+                    let data = this.snapshotToObject(resp);
 
-            firebase.database().ref().update(passengerUpdates).then(function (x) {
-                console.log('Added contact');
-                resolve(x)
-            });
+                    if (data.hasOwnProperty('orderId') && data.orderId == passengerData.orderId) {
+                        resolve(data);
+                    } else {
+                        var newPassengerKey = firebase.database().ref().child('passengers').push().key;
+                        var passengerUpdates = {};
+                        passengerUpdates['/passengers/' + newPassengerKey] = passengerData;
 
+                        firebase.database().ref().update(passengerUpdates).then(function (x) {
+                            console.log('Added contact');
+                            resolve(x)
+                        });
+                    }
+                });
         })
     }
 }
